@@ -1,0 +1,23 @@
+{
+  "name": "studier-back",
+  "version": "1.0.0",
+  "description": "Backend for Studier app",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanEcho/studier-back.git"
+  },
+  "author": "Ivan Zaytsev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oceanEcho/studier-back/issues"
+  },
+  "homepage": "https://github.com/oceanEcho/studier-back#readme",
+  "dependencies": {
+    "@koa/cors": "^3.1.0",
+    "koa": "^2.12.0"
+  }
+}
