@@ -1,54 +1,22 @@
-const Koa = require('koa');
-const Router = require('koa-router');
-const cors = require('@koa/cors');
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser')
+const app = express();
 
-const app = new Koa();
-const router = new Router();
+const APP_PORT = 4000;
 
 app.use(cors());
+app.use(bodyParser.json());
 
-app
-  .use(router.routes())
-  .use(router.allowedMethods());
-
-// logger
-
-app.use(async (ctx, next) => {
-  await next();
-  const rt = ctx.response.get('X-Response-Time');
-  console.log(`${ctx.method} ${ctx.url} - ${rt}`);
+app.all('/', (req, res, next) => {
+  console.log(req.method, req.path);
+  res.send({ hey: 'hey' });
+  next();
 });
 
-// x-response-time
-
-app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  ctx.set('X-Response-Time', `${ms}ms`);
+app.post('/document', (req, res, next) => {
+  console.log(req.method, req.path, req.body);
+  return res.sendStatus(200);
 });
 
-// response
-
-app.use(async (ctx, next) => {
-  console.log(ctx.request)
-
-  const {request: {header: {origin}}} = ctx;
- 
-  if (origin === 'http://localhost:3001') {
-    await next();
-  } else {
-    ctx.throw(401);
-  }
-});
-
-app.use(async (ctx) => {
-  console.log(ctx.request)
-  ctx.body = {
-    id: '571089fa-7d2b-4660-9740-4edcbf4dcdbb',
-    name: 'economic.html',
-    author: 'Dummy Man',
-  };
-});
-
-app.listen(4000);
+app.listen(APP_PORT, () => console.log(`Server listening at http://localhost:${APP_PORT}`));
