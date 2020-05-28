@@ -34,4 +34,10 @@ app.post('/documents', (req, res, next) => {
   return res.sendStatus(200);
 });
 
-app.listen(APP_PORT, () => console.log(`Server listening at http://localhost:${APP_PORT}`));
+
+const customRoutes = require('./routes');
+
+customRoutes.document(app);
+customRoutes.user(app);
+
+app.listen(APP_PORT, () => console.log(`Server is running on port ${APP_PORT}`));
