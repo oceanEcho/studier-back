@@ -3,6 +3,18 @@ const crypto = require('crypto');
 const userRouter = require('express').Router();
 const User = require('../models/user.model');
 
+userRouter.route('/').get((req, res) => {
+  const { user: {user: { _id: userId}} } = req;
+
+  User.findById(userId, (err, user) => {
+    if (!user) {
+      res.status(404).send('User is not found!');
+    } else {
+      res.json(user);
+    }
+  });
+});
+
 userRouter.route('/list').get((req, res) => {
   User.find((err, users) => {
     if (err) {

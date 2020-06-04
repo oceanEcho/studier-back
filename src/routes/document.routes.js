@@ -2,7 +2,9 @@ const documentRouter = require('express').Router();
 const Document = require('../models/document.model');
 
 documentRouter.route('/list').get((req, res) => {
-  Document.find((err, documents) => {
+  const { user: {user: { _id: userId}} } = req;
+
+  Document.find({ authorId: userId}, (err, documents) => {
     if (err) {
       console.log(err);
     } else {
