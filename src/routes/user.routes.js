@@ -4,7 +4,7 @@ const userRouter = require('express').Router();
 const User = require('../models/user.model');
 
 userRouter.route('/').get((req, res) => {
-  const { user: {user: { _id: userId}} } = req;
+  const { user: { user: { _id: userId } } } = req;
 
   User.findById(userId, (err, user) => {
     if (!user) {
@@ -44,10 +44,10 @@ userRouter.route('/:id').put((req, res) => {
         : user.password;
       user.save()
         .then(user => {
-          res.json('User has been updated!');
+          res.json(`User ${user._id} has been updated!`);
         })
         .catch(err => {
-          res.status(400).send('Update is not possible!');
+          res.status(400).send('Update is not possible! Error: ' + err);
         });
     }
   });
@@ -60,10 +60,10 @@ userRouter.route('/:id').delete((req, res) => {
     } else {
       user.delete()
         .then(user => {
-          res.json('User has been deleted!');
+          res.json(`User ${user._id} has been deleted!`);
         })
         .catch(err => {
-          res.status(400).send('Delete is not possible!');
+          res.status(400).send('Delete is not possible! Error: ' + err);
         });
     }
   });
@@ -75,10 +75,10 @@ userRouter.route('/').post((req, res) => {
   user.password = crypto.createHash('md5').update(req.body.password).digest('hex');
   user.save()
     .then(user => {
-      res.status(200).json('User added successfully!');
+      res.status(200).json(`User ${user._id} added successfully!`);
     })
     .catch(err => {
-      res.status(400).send('Adding new user failed!');
+      res.status(400).send('Adding new user failed! Error: ' + err);
     });
 });
 

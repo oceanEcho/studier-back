@@ -1,73 +1,30 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
+
 const dotenv = require('dotenv');
-const crypto = require('crypto');
+const process = require('process');
 
-const User = require('./models/user.model');
-
-dotenv.config();
-
+const connectDatabase = require('./utils/db');
 const routes = require('./routes');
+
+const { authenticateToken } = require('./utils/auth');
 
 const app = express();
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) {
-    return res.sendStatus(401);
-  }
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.sendStatus(401);
-    }
-    req.user = user;
-    next();
-  });
-};
+dotenv.config();
 
-const generateAccessToken = (email) => {
-  return jwt.sign(email, process.env.JWT_SECRET, { expiresIn: '30m' });
-};
+connectDatabase();
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-mongoose.connect('mongodb://127.0.0.1:27017/studier', {
-  useUnifiedTopology: true,
-  useNewUrlParser: true
+app.all('*', (req, res, next) => {
+  console.log(req.method, req.path, new Date());
+  next();
 });
 
-const connection = mongoose.connection;
-
-connection.once('open', function () {
-  console.log('MongoDB database connection established successfully.');
-});
-
-app.post('/login', (req, res) => {
-  const { body: { email, password } } = req;
-
-  User.findOne({
-    email: email
-  }).then(user => {
-    if (!user) {
-      res.statusMessage = 'Such user does not exist';
-      res.status(404).end();
-    } else {
-      if (crypto.createHash('md5').update(password).digest('hex') === user.password) {
-        const token = generateAccessToken({ user });
-        res.json(token);
-      } else {
-        res.statusMessage = 'Current password does not match';
-        res.status(400).end();
-      }
-    }
-  });
-});
-
+app.use('/', routes.auth);
 app.use('/user', authenticateToken, routes.user);
 app.use('/document', authenticateToken, routes.document);
 

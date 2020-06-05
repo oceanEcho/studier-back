@@ -2,9 +2,9 @@ const documentRouter = require('express').Router();
 const Document = require('../models/document.model');
 
 documentRouter.route('/list').get((req, res) => {
-  const { user: {user: { _id: userId}} } = req;
+  const { user: { user: { _id: userId } } } = req;
 
-  Document.find({ authorId: userId}, (err, documents) => {
+  Document.find({ authorId: userId }, (err, documents) => {
     if (err) {
       console.log(err);
     } else {
@@ -34,10 +34,10 @@ documentRouter.route('/:id').put((req, res) => {
 
       document.save()
         .then(document => {
-          res.json('Document has been updated!');
+          res.json(`Document ${document._id} has been updated!`);
         })
         .catch(err => {
-          res.status(400).send('Update is not possible!');
+          res.status(400).send('Update is not possible! Error: ' + err);
         });
     }
   });
@@ -46,14 +46,14 @@ documentRouter.route('/:id').put((req, res) => {
 documentRouter.route('/:id').delete((req, res) => {
   Document.findById(req.params.id, (err, document) => {
     if (!document) {
-      res.status(404).send('Document is not found!');
+      res.status(404).send(`Document ${document._id} is not found!`);
     } else {
       document.delete()
         .then(document => {
-          res.json('Document has been deleted!');
+          res.json(`Document ${document._id} has been deleted!`);
         })
         .catch(err => {
-          res.status(400).send('Delete is not possible!');
+          res.status(400).send('Delete is not possible! Error: ' + err);
         });
     }
   });
@@ -64,10 +64,10 @@ documentRouter.route('/').post((req, res) => {
   document.createdAt = new Date().getTime();
   document.save()
     .then(document => {
-      res.status(200).json('Document added successfully!');
+      res.status(200).json(`Document ${document._id} added successfully!`);
     })
     .catch(err => {
-      res.status(400).send('Adding new document failed!');
+      res.status(400).send('Adding new document failed! Error: ' + err);
     });
 });
 
