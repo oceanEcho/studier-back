@@ -3,17 +3,17 @@ const Schema = mongoose.Schema;
 
 const User = new Schema({
   name: {
-    type: String
+    type: String,
   },
   email: {
-    type: String
+    type: String,
   },
   password: {
-    type: String
+    type: String,
   },
   createdAt: {
-    type: Number
-  }
+    type: Number,
+  },
 });
 
 module.exports = mongoose.model('User', User, 'users');
