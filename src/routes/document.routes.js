@@ -55,17 +55,16 @@ documentRouter.route('/:id').put((req, res) => {
     if (!document) {
       res.status(404).send({ status: 403, message: 'Document is not found!' });
     } else if (document.authorId === userId) {
-      const { name, discipline, content } = req.body;
+      const { name, content } = req.body;
 
-      document.name = name;
+      document.name = name ? name : document.name;
       document.updatedAt = new Date().getTime();
       document.content = content;
-      document.discipline = discipline;
 
       document
         .save()
         .then((document) => {
-          res.json(`Document ${document._id} has been updated!`);
+          res.json(document);
         })
         .catch((err) => {
           res.status(400).send('Update is not possible! Error: ' + err);
@@ -111,7 +110,7 @@ documentRouter.route('/:id').delete((req, res) => {
 documentRouter.route('/').post((req, res) => {
   const {
     user: {
-      user: { _id: userId },
+      user: { _id: userId, name: userName },
     },
   } = req;
 
@@ -120,11 +119,12 @@ documentRouter.route('/').post((req, res) => {
   document.createdAt = new Date().getTime();
   document.updatedAt = document.createdAt;
   document.authorId = userId;
+  document.authorName = userName;
 
   document
     .save()
     .then((document) => {
-      res.status(200).json(`Document ${document._id} added successfully!`);
+      res.json(document);
     })
     .catch((err) => {
       res.status(400).send({

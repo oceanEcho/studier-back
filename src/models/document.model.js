@@ -5,6 +5,9 @@ const Document = new Schema({
   name: {
     type: String,
   },
+  subjectName: {
+    type: String,
+  },
   subjectId: {
     type: String,
   },
