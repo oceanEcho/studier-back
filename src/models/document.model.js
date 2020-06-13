@@ -3,26 +3,26 @@ const Schema = mongoose.Schema;
 
 const Document = new Schema({
   name: {
-    type: String
+    type: String,
   },
-  discipline: {
-    type: String
+  subjectId: {
+    type: String,
   },
   authorName: {
-    type: String
+    type: String,
   },
   authorId: {
-    type: String
+    type: String,
   },
   createdAt: {
-    type: Number
+    type: Number,
   },
   updatedAt: {
-    type: Number
+    type: Number,
   },
   content: {
-    type: String
-  }
+    type: String,
+  },
 });
 
 module.exports = mongoose.model('Document', Document, 'documents');

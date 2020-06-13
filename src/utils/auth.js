@@ -23,7 +23,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 const generateAccessToken = (email) => {
-  return jwt.sign(email, process.env.JWT_SECRET, { expiresIn: '30m' });
+  return jwt.sign(email, process.env.JWT_SECRET, { expiresIn: '24h' });
 };
 
 module.exports = {

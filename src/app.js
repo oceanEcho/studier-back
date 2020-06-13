@@ -27,6 +27,7 @@ app.all('*', (req, res, next) => {
 app.use('/', routes.auth);
 app.use('/user', authenticateToken, routes.user);
 app.use('/document', authenticateToken, routes.document);
+app.use('/subject', authenticateToken, routes.subject);
 
 const APP_HOST = process.env.HOST || '127.0.0.1';
 const APP_PORT = process.env.PORT || 4000;
