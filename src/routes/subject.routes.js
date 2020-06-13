@@ -109,32 +109,29 @@ subjectRouter.route('/').post((req, res) => {
 
   Subject.findOne({ name }, function (err, subject) {
     if (subject) {
-      res
-        .status(409)
-        .send({
-          status: 409,
-          message: 'Subject already exists!',
+      res.status(409).send({
+        status: 409,
+        message: 'Subject already exists!',
+      });
+    } else {
+      const subject = new Subject(req.body);
+
+      subject.createdAt = new Date().getTime();
+      subject.authorId = userId;
+
+      subject
+        .save()
+        .then((subject) => {
+          res.status(200).json(`Subject ${subject._id} added successfully!`);
         })
-        .end();
+        .catch((err) => {
+          res.status(400).send({
+            status: 400,
+            message: 'Adding new subject failed! Error: ' + err,
+          });
+        });
     }
   });
-
-  const subject = new Subject(req.body);
-
-  subject.createdAt = new Date().getTime();
-  subject.authorId = userId;
-
-  subject
-    .save()
-    .then((subject) => {
-      res.status(200).json(`Subject ${subject._id} added successfully!`);
-    })
-    .catch((err) => {
-      res.status(400).send({
-        status: 400,
-        message: 'Adding new subject failed! Error: ' + err,
-      });
-    });
 });
 
 module.exports = subjectRouter;
