@@ -1,5 +1,6 @@
 const documentRouter = require('express').Router();
 const Document = require('../models/document.model');
+const Subject = require('../models/subject.model');
 
 documentRouter.route('/list').get((req, res) => {
   const {
@@ -95,13 +96,22 @@ documentRouter.route('/:id').delete((req, res) => {
         .then((document) => {
           res.send({
             status: 200,
-            message: `Документ "${document.name}" успешно удалён!`,
+            message: `Документ "${document.name}" успешно удалён`,
+            id: document._id,
+            subjectId: document.subjectId,
+          });
+
+          Subject.findById(document.subjectId, (err, subject) => {
+            if (subject.documentCount > 0) {
+              subject.documentCount = subject.documentCount - 1;
+            }
+            subject.save();
           });
         })
         .catch(() => {
           res.send({
             status: 400,
-            message: `Удаление документа "${document.name}" невозможно!`,
+            message: `При удалении документа "${document.name}" произошла ошибка!`,
           });
         });
     } else {
@@ -130,6 +140,11 @@ documentRouter.route('/').post((req, res) => {
   document
     .save()
     .then((document) => {
+      Subject.findById(document.subjectId, (err, subject) => {
+        subject.documentCount = subject.documentCount + 1;
+        subject.save();
+      });
+
       res.json(document);
     })
     .catch((err) => {

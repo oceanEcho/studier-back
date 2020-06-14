@@ -1,5 +1,6 @@
 const subjectRouter = require('express').Router();
 const Subject = require('../models/subject.model');
+const Document = require('../models/document.model');
 
 subjectRouter.route('/list').get((req, res) => {
   const {
@@ -33,6 +34,23 @@ subjectRouter.route('/:id').get((req, res) => {
         status: 403,
         message: 'Forbidden',
       });
+    }
+  });
+});
+
+subjectRouter.route('/:id/documents').get((req, res) => {
+  const {
+    user: {
+      user: { _id: userId },
+    },
+    params: { id },
+  } = req;
+
+  Document.find({ subjectId: id, authorId: userId }, function (err, documents) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.json(documents);
     }
   });
 });
