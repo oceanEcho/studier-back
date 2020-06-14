@@ -25,6 +25,7 @@ app.all('*', (req, res, next) => {
 });
 
 app.use('/', routes.auth);
+app.use('/', routes.register);
 app.use('/user', authenticateToken, routes.user);
 app.use('/document', authenticateToken, routes.document);
 app.use('/subject', authenticateToken, routes.subject);

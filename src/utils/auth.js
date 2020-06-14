@@ -7,14 +7,14 @@ const authenticateToken = (req, res, next) => {
   if (!token) {
     return res.status(401).send({
       status: 401,
-      message: 'Unauthorized',
+      message: 'Вы не авторизованы',
     });
   }
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
       return res.status(403).send({
         status: 403,
-        message: 'Forbidden',
+        message: 'Доступ запрещён',
       });
     }
     req.user = user;

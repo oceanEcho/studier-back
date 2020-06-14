@@ -3,6 +3,7 @@ const user = require('./user.routes');
 const auth = require('./auth.routes');
 const subject = require('./subject.routes');
 const note = require('./note.routes');
+const register = require('./register.routes');
 
 module.exports = {
   document,
@@ -10,4 +11,5 @@ module.exports = {
   auth,
   subject,
   note,
+  register,
 };
