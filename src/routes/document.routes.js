@@ -10,7 +10,7 @@ documentRouter.route('/list').get((req, res) => {
   } = req;
 
   Document.find({ authorId: userId })
-    .sort({ createdAt: -1 })
+    .sort({ updatedAt: -1 })
     .limit(Number(count))
     .exec((err, documents) => {
       if (err) {
@@ -93,10 +93,16 @@ documentRouter.route('/:id').delete((req, res) => {
       document
         .delete()
         .then((document) => {
-          res.json(`Document ${document._id} has been deleted!`);
+          res.send({
+            status: 200,
+            message: `Документ "${document.name}" успешно удалён!`,
+          });
         })
-        .catch((err) => {
-          res.status(400).send('Delete is not possible! Error: ' + err);
+        .catch(() => {
+          res.send({
+            status: 400,
+            message: `Удаление документа "${document.name}" невозможно!`,
+          });
         });
     } else {
       return res.status(403).send({
@@ -117,7 +123,7 @@ documentRouter.route('/').post((req, res) => {
   const document = new Document(req.body);
 
   document.createdAt = new Date().getTime();
-  document.updatedAt = document.createdAt;
+  document.updatedAt = new Date().getTime();
   document.authorId = userId;
   document.authorName = userName;
 
