@@ -31,9 +31,8 @@ app.use('/document', authenticateToken, routes.document);
 app.use('/subject', authenticateToken, routes.subject);
 app.use('/note', authenticateToken, routes.note);
 
-const APP_HOST = process.env.HOST || '127.0.0.1';
 const APP_PORT = process.env.PORT || 4000;
 
-app.listen(APP_PORT, APP_HOST, () => {
-  console.log(`Server is running on  ${APP_HOST}:${APP_PORT}.`);
+app.listen(APP_PORT, () => {
+  console.log(`Server is running on  port ${APP_PORT}.`);
 });
