@@ -96,7 +96,7 @@ documentRouter.route('/:id').delete((req, res) => {
         .then((document) => {
           res.send({
             status: 200,
-            message: `Документ "${document.name}" успешно удалён`,
+            message: `Документ "${document.name}" был успешно удалён`,
             id: document._id,
             subjectId: document.subjectId,
           });
