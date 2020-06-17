@@ -125,7 +125,7 @@ subjectRouter.route('/').post((req, res) => {
     body: { name },
   } = req;
 
-  Subject.findOne({ name }, function (err, subject) {
+  Subject.findOne({ name: name, authorId: userId }, function (err, subject) {
     if (subject) {
       res.status(409).send({
         status: 409,
