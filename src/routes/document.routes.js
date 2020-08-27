@@ -1,4 +1,8 @@
+const { createWriteStream, unlink, access } = require('fs');
+const { F_OK } = require('constants');
+
 const documentRouter = require('express').Router();
+
 const Document = require('../models/document.model');
 const Subject = require('../models/subject.model');
 
@@ -32,7 +36,7 @@ documentRouter.route('/:id').get((req, res) => {
 
   Document.findById(id, function (err, document) {
     if (!document) {
-      res.status(404).send({ status: 403, message: 'Document is not found!' });
+      res.status(404).send({ status: 404, message: 'Document not found!' });
     } else if (document.authorId === userId) {
       res.json(document);
     } else {
@@ -54,7 +58,7 @@ documentRouter.route('/:id').put((req, res) => {
 
   Document.findById(id, (err, document) => {
     if (!document) {
-      res.status(404).send({ status: 403, message: 'Document is not found!' });
+      res.status(404).send({ status: 404, message: 'Document not found!' });
     } else if (document.authorId === userId) {
       const { name, content } = req.body;
 
@@ -89,16 +93,34 @@ documentRouter.route('/:id').delete((req, res) => {
 
   Document.findById(id, (err, document) => {
     if (!document) {
-      res.status(404).send({ status: 403, message: 'Document is not found!' });
+      res.status(404).send({ status: 404, message: 'Document not found!' });
     } else if (document.authorId === userId) {
       document
         .delete()
         .then((document) => {
-          res.send({
-            status: 200,
-            message: `Документ "${document.name}" был успешно удалён`,
-            id: document._id,
-            subjectId: document.subjectId,
+          access(`./files/${id}`, F_OK, (err) => {
+            if (err) {
+              res.send({
+                status: 204,
+                message: 'Already deleted.',
+              });
+            }
+
+            unlink(`./files/${id}`, (err) => {
+              if (err) {
+                res.send({
+                  status: 400,
+                  message: `При удалении документа "${document.name}" произошла ошибка!`,
+                });
+              }
+
+              res.send({
+                status: 200,
+                message: `Документ "${document.name}" был успешно удалён`,
+                id: document._id,
+                subjectId: document.subjectId,
+              });
+            });
           });
 
           Subject.findById(document.subjectId, (err, subject) => {
@@ -153,6 +175,38 @@ documentRouter.route('/').post((req, res) => {
         message: 'Adding new document failed! Error: ' + err,
       });
     });
+});
+
+documentRouter.route('/:id/file').post((req, res) => {
+  const {
+    user: {
+      user: { _id: userId },
+    },
+    params: { id },
+  } = req;
+
+  Document.findById(id, (err, document) => {
+    if (err) {
+      res.send({
+        status: 400,
+        message: `При добавлении документа "${document.name}" произошла ошибка!`,
+      });
+    }
+
+    if (!document) {
+      res.status(404).send({ status: 404, message: 'Document is not found!' });
+    } else if (document.authorId === userId) {
+      req.pipe(createWriteStream(`./files/${id}`));
+      req.on('end', () => {
+        res.status(200);
+      });
+    } else {
+      return res.status(403).send({
+        status: 403,
+        message: 'Forbidden',
+      });
+    }
+  });
 });
 
 module.exports = documentRouter;
