@@ -3,6 +3,8 @@ const { F_OK } = require('constants');
 
 const documentRouter = require('express').Router();
 
+const { ERRORS } = require('../constants');
+
 const Document = require('../models/document.model');
 const Subject = require('../models/subject.model');
 
@@ -20,6 +22,7 @@ documentRouter.route('/list').get((req, res) => {
     .exec((err, documents) => {
       if (err) {
         console.log(err);
+        res.status(400).send(ERRORS.GET_DOCUMENT_LIST);
       } else {
         res.json(documents);
       }
@@ -36,14 +39,11 @@ documentRouter.route('/:id').get((req, res) => {
 
   Document.findById(id, function (err, document) {
     if (!document) {
-      res.status(404).send({ status: 404, message: 'Document not found!' });
+      res.status(404).send(ERRORS.DOCUMENT_NOT_FOUND);
     } else if (document.authorId === userId) {
       res.json(document);
     } else {
-      return res.status(403).send({
-        status: 403,
-        message: 'Forbidden',
-      });
+      return res.status(403).send(ERRORS.FORBIDDEN);
     }
   });
 });
@@ -57,8 +57,11 @@ documentRouter.route('/:id').put((req, res) => {
   } = req;
 
   Document.findById(id, (err, document) => {
-    if (!document) {
-      res.status(404).send({ status: 404, message: 'Document not found!' });
+    if (err) {
+      console.log(err);
+      res.status(400).send(ERRORS.UPDATE_DOCUMENT);
+    } else if (!document) {
+      res.status(404).send(ERRORS.DOCUMENT_NOT_FOUND);
     } else if (document.authorId === userId) {
       const { name, content } = req.body;
 
@@ -72,13 +75,11 @@ documentRouter.route('/:id').put((req, res) => {
           res.json(document);
         })
         .catch((err) => {
-          res.status(400).send('Update is not possible! Error: ' + err);
+          console.log(err);
+          res.status(400).send(ERRORS.UPDATE_DOCUMENT);
         });
     } else {
-      return res.status(403).send({
-        status: 403,
-        message: 'Forbidden',
-      });
+      return res.status(403).send(ERRORS.FORBIDDEN);
     }
   });
 });
@@ -93,7 +94,7 @@ documentRouter.route('/:id').delete((req, res) => {
 
   Document.findById(id, (err, document) => {
     if (!document) {
-      res.status(404).send({ status: 404, message: 'Document not found!' });
+      res.status(404).send(ERRORS.DOCUMENT_NOT_FOUND);
     } else if (document.authorId === userId) {
       document
         .delete()
@@ -137,10 +138,7 @@ documentRouter.route('/:id').delete((req, res) => {
           });
         });
     } else {
-      return res.status(403).send({
-        status: 403,
-        message: 'Forbidden',
-      });
+      return res.status(403).send(ERRORS.FORBIDDEN);
     }
   });
 });
@@ -194,17 +192,14 @@ documentRouter.route('/:id/file').post((req, res) => {
     }
 
     if (!document) {
-      res.status(404).send({ status: 404, message: 'Document is not found!' });
+      res.status(404).send(ERRORS.DOCUMENT_NOT_FOUND);
     } else if (document.authorId === userId) {
       req.pipe(createWriteStream(`./files/${id}`));
       req.on('end', () => {
         res.status(200);
       });
     } else {
-      return res.status(403).send({
-        status: 403,
-        message: 'Forbidden',
-      });
+      return res.status(403).send(ERRORS.FORBIDDEN);
     }
   });
 });
